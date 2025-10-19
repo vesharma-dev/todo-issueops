@@ -29,6 +29,7 @@ describe('runTodoBotOrchestrator', () => {
     rest: {
       repos: {
         compareCommits: jest.fn(),
+        getCommit: jest.fn(),
       },
     },
   };
@@ -161,5 +162,95 @@ describe('runTodoBotOrchestrator', () => {
     expect(findExistingIssue).toHaveBeenCalledWith(mockOctokit, 'test-owner', 'test-repo', 'fp-no-issue');
     expect(closeIssueForTodo).not.toHaveBeenCalled();
     expect(core.info).toHaveBeenCalledWith('No existing issue found for removed TODO: Non-existent TODO');
+  });
+
+  describe('when handling new branch pushes', () => {
+    const zeroSha = '0000000000000000000000000000000000000000';
+
+    beforeEach(() => {
+      github.context.payload.before = zeroSha;
+      // @ts-ignore
+      mockOctokit.rest.repos.getCommit = jest.fn();
+    });
+
+    it('should use the parent commit for comparison on a new branch', async () => {
+      const parentSha = 'parent-sha-123';
+      const headSha = 'head-sha-456';
+      github.context.payload.after = headSha;
+
+      (mockOctokit.rest.repos.getCommit as jest.Mock).mockResolvedValue({
+        data: {
+          parents: [{ sha: parentSha }],
+        },
+      });
+
+      const addedTodos: TodoComment[] = [
+        {
+          content: 'New TODO on new branch',
+          filePath: 'file.js',
+          lineNumber: 10,
+          fingerprint: 'fp-new-branch',
+          keywords: 'TODO',
+        },
+      ];
+      (extractTodosFromDiff as jest.Mock).mockReturnValue({ addedTodos, removedTodos: [] });
+      (findExistingIssue as jest.Mock).mockResolvedValue(null);
+
+      await runTodoBotOrchestrator();
+
+      expect(core.info).toHaveBeenCalledWith('New branch detected. Finding parent commit for comparison.');
+      expect(mockOctokit.rest.repos.getCommit).toHaveBeenCalledWith({
+        owner: 'test-owner',
+        repo: 'test-repo',
+        ref: headSha,
+      });
+      expect(core.info).toHaveBeenCalledWith(`Parent commit found: ${parentSha}`);
+      expect(mockOctokit.rest.repos.compareCommits).toHaveBeenCalledWith({
+        owner: 'test-owner',
+        repo: 'test-repo',
+        base: parentSha,
+        head: headSha,
+      });
+      expect(createIssueForTodo).toHaveBeenCalled();
+    });
+
+    it('should handle the first commit in a repository', async () => {
+      const headSha = 'first-commit-sha';
+      github.context.payload.after = headSha;
+
+      // First getCommit call to find parent (returns none)
+      (mockOctokit.rest.repos.getCommit as jest.Mock).mockResolvedValueOnce({
+        data: {
+          parents: [],
+        },
+      });
+
+      const commitFiles = [{ filename: 'init.js', patch: '@@ -0,0 +1 @@\n+// TODO: Initial setup' }];
+      // Second getCommit call to get commit files
+      (mockOctokit.rest.repos.getCommit as jest.Mock).mockResolvedValueOnce({
+        data: {
+          files: commitFiles,
+        },
+      });
+
+      const addedTodos: TodoComment[] = [
+        { content: 'Initial TODO', filePath: 'init.js', lineNumber: 1, fingerprint: 'fp-init', keywords: 'TODO' },
+      ];
+      (extractTodosFromDiff as jest.Mock).mockReturnValue({ addedTodos, removedTodos: [] });
+      (findExistingIssue as jest.Mock).mockResolvedValue(null);
+
+      await runTodoBotOrchestrator();
+
+      expect(core.info).toHaveBeenCalledWith('First commit in repository. Processing all files in this commit.');
+      expect(mockOctokit.rest.repos.getCommit).toHaveBeenCalledWith({
+        owner: 'test-owner',
+        repo: 'test-repo',
+        ref: headSha,
+      });
+      expect(mockOctokit.rest.repos.compareCommits).not.toHaveBeenCalled();
+      expect(extractTodosFromDiff).toHaveBeenCalledWith(commitFiles, ['TODO', 'FIXME']);
+      expect(createIssueForTodo).toHaveBeenCalled();
+      expect(core.info).toHaveBeenCalledWith('✅ TODO Bot completed successfully for the first commit.');
+    });
   });
 });

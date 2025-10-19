@@ -32,14 +32,57 @@ export async function runTodoBotOrchestrator(): Promise<void> {
       return;
     }
 
-    core.info(`Comparing commits ${payload.before}...${payload.after}`);
+    let base = payload.before;
+    const head = payload.after;
+
+    // Handle new branch push where `before` is a zero-hash
+    if (base === '0000000000000000000000000000000000000000') {
+      core.info('New branch detected. Finding parent commit for comparison.');
+      // For a new branch, we find the parent of the first commit in the push
+      const commit = await octokit.rest.repos.getCommit({
+        owner,
+        repo,
+        ref: head,
+      });
+
+      if (commit.data.parents.length > 0) {
+        base = commit.data.parents[0].sha;
+        core.info(`Parent commit found: ${base}`);
+      } else {
+        // This is the first commit in the repository. We'll compare against an empty tree.
+        // The compareCommits API can't handle this, so we'll get the commit directly
+        // and treat all files as added.
+        core.info('First commit in repository. Processing all files in this commit.');
+        const { data: commitData } = await octokit.rest.repos.getCommit({
+          owner,
+          repo,
+          ref: head,
+        });
+
+        const { addedTodos } = extractTodosFromDiff(commitData.files, inputs.keywords);
+        core.info(`Found ${addedTodos.length} new TODOs in the first commit.`);
+
+        for (const todo of addedTodos) {
+          const existingIssue = await findExistingIssue(octokit, owner, repo, todo.fingerprint);
+          if (!existingIssue) {
+            await createIssueForTodo(octokit, owner, repo, todo, inputs.assignees, inputs.labels, head);
+          } else {
+            core.info(`Issue #${existingIssue} already exists for TODO: ${todo.content}`);
+          }
+        }
+        core.info('✅ TODO Bot completed successfully for the first commit.');
+        return;
+      }
+    }
+
+    core.info(`Comparing commits ${base}...${head}`);
 
     // Get the diff between commits
     const compareResponse = await octokit.rest.repos.compareCommits({
       owner,
       repo,
-      base: payload.before,
-      head: payload.after,
+      base,
+      head,
     });
 
     // Extract TODOs from the diff
