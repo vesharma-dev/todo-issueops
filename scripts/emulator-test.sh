@@ -157,6 +157,11 @@ cleanup() {
 simulate_single_commit_push() {
     echo "🚀 Simulating single commit push to a new branch..."
 
+    # 0. Save the user's current branch
+    local original_branch
+    original_branch=$(git symbolic-ref --short HEAD)
+    echo "✅ Saved current branch: $original_branch"
+
     # 1. Ensure we have a base commit to work from
     git checkout main &>/dev/null || git checkout master &>/dev/null
     if [ -z "$(git log --oneline 2>/dev/null)" ]; then
@@ -178,11 +183,7 @@ simulate_single_commit_push() {
     local base_commit
     base_commit=$(git rev-parse HEAD^) # Get the parent commit
 
-    # 4. Generate a git diff and save it to a file
-    git diff --no-color "$base_commit" "$head_commit" > test.diff
-    echo "📄 Created test.diff for local testing"
-
-    # 5. Create the event payload for act
+    # 4. Create the event payload for act, simulating a normal push event
     local repo_full_name
     repo_full_name=$(git config --get remote.origin.url | sed -e 's/.*github.com\///' -e 's/\.git$//' 2>/dev/null) || repo_full_name="test-owner/test-repo"
     
@@ -204,9 +205,10 @@ simulate_single_commit_push() {
 }
 EOF
 
-    echo "📄 Created event payload"
-    
-    # 6. Run act with the specific event
+    echo "📄 Created event payload with base: $base_commit and head: $head_commit"
+    cat event.json
+
+    # 5. Run act with the specific event
     echo "🚀 Running act for the push event..."
     if [ -f ".secrets" ]; then
         act push -W .github/workflows/dev-test.yml \
@@ -224,13 +226,16 @@ EOF
             -v
     fi
 
-    # 7. Clean up
+    # 6. Clean up
     echo "🧹 Cleaning up test branch and files..."
     git checkout main &>/dev/null || git checkout master &>/dev/null
     git branch -D test-single-commit-branch &>/dev/null || true
     rm -f event.json
-    rm -f test.diff
     rm -f test-files/single-commit-feature.js
+
+    # 7. Restore original branch
+    echo "🔄 Restoring original branch: $original_branch"
+    git checkout "$original_branch"
 
     echo "✅ Simulation complete."
 }
