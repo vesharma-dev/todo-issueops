@@ -1,0 +1,17 @@
+# act configuration file
+# This file configures act to use smaller, faster Docker images for local testing
+
+# Use micro images for faster testing (optional - you can remove this line for full Ubuntu)
+-P ubuntu-latest=node:22-slim
+
+# Default platform
+--platform ubuntu-latest=node:22-slim
+
+# Enable verbose logging by default
+--verbose
+
+# Container architecture (especially important for M1/M2 Macs)
+--container-architecture linux/amd64
+
+# Enable artifact server
+--artifact-server-path /tmp/act-artifacts
