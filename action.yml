@@ -1,4 +1,4 @@
-name: 'TODO Bot'
+name: 'TODO IssueOps'
 description: 'An IssueOps Action that automatically manages issues from TODO comments in your code.'
 author: '@vesharma-dev'
 inputs:
