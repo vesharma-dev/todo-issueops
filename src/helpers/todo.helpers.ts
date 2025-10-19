@@ -19,9 +19,12 @@ export function generateFingerprint(content: string, filePath: string, lineConte
  * @returns The TODO content if found, null otherwise
  */
 export function parseTodoFromLine(line: string, keywords: string[]): string | null {
-  // Create regex pattern that matches any of the keywords followed by a colon and content
+  // Create regex pattern that matches any of the keywords followed by an optional colon and content
   const keywordPattern = keywords.join('|');
-  const todoRegex = new RegExp(`(?://|#|<!--|/\\*)\\s*(${keywordPattern})\\s*:?\\s*(.+?)(?:\\s*-->|\\s*\\*/|$)`, 'i');
+  const todoRegex = new RegExp(
+    `(?:\\/\\/|#|<!--|\\/\\*)\\s*(${keywordPattern})(?::|\\s+)(.+?)(?:\\s*-->|\\s*\\*\\/|$)`,
+    'i'
+  );
 
   const match = line.match(todoRegex);
   if (match && match[2]) {
