@@ -233,21 +233,19 @@ export function getActionInputs(): ActionInputs {
     }
   }
 
-  const keywordsInput = core.getInput('keywords') || 'TODO,FIXME';
+  const keywordsInput = core.getInput('keywords');
   const assigneesInput = core.getInput('assignees');
-  const labelsInput = core.getInput('labels') || 'todo-bot';
+  const labelsInput = core.getInput('labels');
 
-  const keywords = keywordsInput
+  const keywords = (keywordsInput || 'TODO,FIXME')
     .split(',')
     .map((k: string) => k.trim())
     .filter((k: string) => k.length > 0);
-  const assignees = assigneesInput
-    ? assigneesInput
-        .split(',')
-        .map((a: string) => a.trim())
-        .filter((a: string) => a.length > 0)
-    : [];
-  const labels = labelsInput
+  const assignees = (assigneesInput || '')
+    .split(',')
+    .map((a: string) => a.trim())
+    .filter((a: string) => a.length > 0);
+  const labels = (labelsInput || 'todo-bot')
     .split(',')
     .map((l: string) => l.trim())
     .filter((l: string) => l.length > 0);
