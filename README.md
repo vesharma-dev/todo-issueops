@@ -22,25 +22,27 @@ A GitHub Action that automatically creates, updates, and closes GitHub issues fr
 Add this action to your workflow file (`.github/workflows/todo-issueops.yml`):
 
 ```yaml
-name: TODO Bot
+name: 'TODO IssueOps'
 on:
-  push:
-    branches: [main, develop]
+  pull_request:
+    types: [opened, synchronize] # Runs when a PR is opened or updated
 
 jobs:
-  todo-issueops:
+  track_todos:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: 'Checkout Code'
         uses: actions/checkout@v4
 
-      - name: TODO Bot
-        uses: vesharma-dev/todo-issueops@v1
+      - name: 'Run TODO IssueOps'
+        uses: vesharma-dev/todo-bot@v1.0.4 # Use your GitHub username and the new tag
         with:
+          # The default token is sufficient for most cases
           token: ${{ secrets.GITHUB_TOKEN }}
-          keywords: 'TODO,FIXME,HACK,NOTE'
-          labels: 'todo-issueops,enhancement'
-          assignees: 'vesharma-dev'
+          # Optional: customize keywords, labels, or assignees
+          # keywords: 'TODO,FIXME,HACK,NOTE'
+          # labels: 'todo, needs-attention'
+          # assignees: 'vesharma-dev'
 ```
 
 ## 📖 How It Works
