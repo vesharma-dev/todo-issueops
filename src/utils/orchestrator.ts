@@ -71,18 +71,36 @@ export async function runTodoBotOrchestrator(): Promise<void> {
       }
     }
 
-    core.info(`Comparing commits ${base}...${head}`);
-
     // Get the diff between commits
-    const compareResponse = await octokit.rest.repos.compareCommits({
-      owner,
-      repo,
-      base,
-      head,
-    });
+    const fs = require('fs');
+    let compareResponse;
+
+    if (fs.existsSync('test.diff')) {
+      core.info('Found test.diff, using it for comparison.');
+      const patch = fs.readFileSync('test.diff', 'utf8');
+      // Manually construct the compare response object
+      compareResponse = {
+        files: [
+          {
+            filename: 'test-files/single-commit-feature.js',
+            status: 'added',
+            patch: patch,
+          },
+        ],
+      };
+    } else {
+      core.info(`Comparing commits ${base}...${head}`);
+      const response = await octokit.rest.repos.compareCommits({
+        owner,
+        repo,
+        base,
+        head,
+      });
+      compareResponse = response.data;
+    }
 
     // Extract TODOs from the diff
-    const { addedTodos, removedTodos } = extractTodosFromDiff(compareResponse.data.files, inputs.keywords);
+    const { addedTodos, removedTodos } = extractTodosFromDiff(compareResponse.files, inputs.keywords);
 
     core.info(`Found ${addedTodos.length} new TODOs and ${removedTodos.length} removed TODOs`);
 

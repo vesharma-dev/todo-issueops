@@ -145,9 +145,94 @@ debug_build() {
 cleanup() {
     echo "🧹 Cleaning up..."
     rm -rf dist/ lib/
+    git checkout main &>/dev/null || git checkout master &>/dev/null
+    git branch -D test-single-commit-branch &>/dev/null || true
+    rm -f event.json
     docker rmi todo-bot-local 2>/dev/null || true
     docker rmi act-dockeraction:latest 2>/dev/null || true
     echo "✅ Cleanup complete"
+}
+
+# Function to simulate a single commit push to a new branch
+simulate_single_commit_push() {
+    echo "🚀 Simulating single commit push to a new branch..."
+
+    # 1. Ensure we have a base commit to work from
+    git checkout main &>/dev/null || git checkout master &>/dev/null
+    if [ -z "$(git log --oneline 2>/dev/null)" ]; then
+        echo "Creating initial commit on main branch."
+        git commit --allow-empty -m "Initial commit"
+    fi
+    local main_commit
+    main_commit=$(git rev-parse HEAD)
+
+    # 2. Create a new branch and a new commit
+    git checkout -b test-single-commit-branch
+    echo "// TODO: This is a test for a single commit push" > test-files/single-commit-feature.js
+    git add test-files/single-commit-feature.js
+    git commit -m "feat: Add new feature with a TODO for single commit test"
+    
+    # 3. Get the new commit SHA and its parent
+    local head_commit
+    head_commit=$(git rev-parse HEAD)
+    local base_commit
+    base_commit=$(git rev-parse HEAD^) # Get the parent commit
+
+    # 4. Generate a git diff and save it to a file
+    git diff --no-color "$base_commit" "$head_commit" > test.diff
+    echo "📄 Created test.diff for local testing"
+
+    # 5. Create the event payload for act
+    local repo_full_name
+    repo_full_name=$(git config --get remote.origin.url | sed -e 's/.*github.com\///' -e 's/\.git$//' 2>/dev/null) || repo_full_name="test-owner/test-repo"
+    
+    cat > event.json <<EOF
+{
+  "ref": "refs/heads/test-single-commit-branch",
+  "before": "$base_commit",
+  "after": "$head_commit",
+  "pusher": {
+    "name": "test-user"
+  },
+  "repository": {
+    "full_name": "$repo_full_name",
+    "name": "${repo_full_name##*/}",
+    "owner": {
+      "login": "${repo_full_name%%/*}"
+    }
+  }
+}
+EOF
+
+    echo "📄 Created event payload"
+    
+    # 6. Run act with the specific event
+    echo "🚀 Running act for the push event..."
+    if [ -f ".secrets" ]; then
+        act push -W .github/workflows/dev-test.yml \
+            --eventpath event.json \
+            --container-architecture linux/amd64 \
+            --secret-file .secrets \
+            --artifact-server-path /tmp/artifacts \
+            -v
+    else
+        echo "⚠️  No .secrets file found - running without GitHub token"
+        act push -W .github/workflows/dev-test.yml \
+            --eventpath event.json \
+            --container-architecture linux/amd64 \
+            --artifact-server-path /tmp/artifacts \
+            -v
+    fi
+
+    # 7. Clean up
+    echo "🧹 Cleaning up test branch and files..."
+    git checkout main &>/dev/null || git checkout master &>/dev/null
+    git branch -D test-single-commit-branch &>/dev/null || true
+    rm -f event.json
+    rm -f test.diff
+    rm -f test-files/single-commit-feature.js
+
+    echo "✅ Simulation complete."
 }
 
 # Main menu
@@ -158,13 +243,14 @@ while true; do
     echo "2. Run basic act test"
     echo "3. Run act with GitHub token"
     echo "4. Simulate TODO changes and test"
-    echo "5. Build Docker image locally"
-    echo "6. Debug build issues"
-    echo "7. Clean up artifacts"
-    echo "8. View act help"
-    echo "9. Exit"
+    echo "5. Simulate single commit push to new branch"
+    echo "6. Build Docker image locally"
+    echo "7. Debug build issues"
+    echo "8. Clean up artifacts"
+    echo "9. View act help"
+    echo "10. Exit"
     echo ""
-    read -p "Enter your choice [1-9]: " choice
+    read -p "Enter your choice [1-10]: " choice
     
     case $choice in
         1)
@@ -181,24 +267,27 @@ while true; do
             run_act_test
             ;;
         5)
-            build_docker_image
+            simulate_single_commit_push
             ;;
         6)
-            debug_build
+            build_docker_image
             ;;
         7)
-            cleanup
+            debug_build
             ;;
         8)
+            cleanup
+            ;;
+        9)
             echo "📖 Act help:"
             act --help
             ;;
-        9)
+        10)
             echo "👋 Goodbye!"
             exit 0
             ;;
         *)
-            echo "❌ Invalid option. Please choose 1-9."
+            echo "❌ Invalid option. Please choose 1-10."
             ;;
     esac
 done
