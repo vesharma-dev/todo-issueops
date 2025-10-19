@@ -31,7 +31,7 @@ export async function runTodoBotOrchestrator(): Promise<void> {
       core.warning('This action is designed to run on push events with before/after commit SHAs');
       return;
     }
-
+    // TODO: Fix this issue on first commit push to new branch Warning: This action is designed to run on push events with before/after commit SHAs
     let base = payload.before;
     const head = payload.after;
 
