@@ -7,7 +7,8 @@
   "scripts": {
     "build": "tsc ",
     "clean": "rm -rf dist",
-    "test": "jest",
+    "test:ci": "jest --config ./src/config/jest/jest.config.js --ci --coverage",
+    "test": "jest --config ./src/config/jest/jest.config.js --coverage",
     "dev": "tsc --watch",
     "start": "node dist/index.js",
     "manual-test": "./scripts/manual-test.sh",
@@ -20,11 +21,13 @@
     "@actions/github": "^6.0.0"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^20.0.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "jest": "^29.0.0",
     "prettier": "^3.6.2",
+    "ts-jest": "^29.4.5",
     "typescript": "^5.0.0"
   },
   "keywords": [
