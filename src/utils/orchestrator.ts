@@ -26,14 +26,29 @@ export async function runTodoBotOrchestrator(): Promise<void> {
     const { owner, repo } = github.context.repo;
     const payload = github.context.payload;
 
-    // Ensure we have push event data
-    if (!payload.before || !payload.after) {
-      core.warning('This action is designed to run on push events with before/after commit SHAs');
+    let base: string | undefined;
+    let head: string | undefined;
+
+    switch (github.context.eventName) {
+      case 'pull_request':
+        base = payload.pull_request?.base.sha;
+        head = payload.pull_request?.head.sha;
+        break;
+      case 'push':
+        base = payload.before;
+        head = payload.after;
+        break;
+      default:
+        core.setFailed(
+          `This action only supports pull_request and push events, but received ${github.context.eventName}`
+        );
+        return;
+    }
+
+    if (!base || !head) {
+      core.warning('Could not determine base or head commit SHA.');
       return;
     }
-    // TODO: Fix this issue on first commit push to new branch Warning: This action is designed to run on push events with before/after commit SHAs
-    let base = payload.before;
-    const head = payload.after;
 
     // Handle new branch push where `before` is a zero-hash
     if (base === '0000000000000000000000000000000000000000') {
@@ -91,7 +106,7 @@ export async function runTodoBotOrchestrator(): Promise<void> {
       const existingIssue = await findExistingIssue(octokit, owner, repo, todo.fingerprint);
 
       if (!existingIssue) {
-        await createIssueForTodo(octokit, owner, repo, todo, inputs.assignees, inputs.labels, payload.after);
+        await createIssueForTodo(octokit, owner, repo, todo, inputs.assignees, inputs.labels, head);
       } else {
         core.info(`Issue #${existingIssue} already exists for TODO: ${todo.content}`);
       }

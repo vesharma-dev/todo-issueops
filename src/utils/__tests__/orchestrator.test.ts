@@ -38,7 +38,8 @@ describe('runTodoBotOrchestrator', () => {
     // Reset mocks before each test
     jest.clearAllMocks();
 
-    // Restore github context payload for each test
+    // Set default event context for push events
+    github.context.eventName = 'push';
     github.context.payload = {
       before: 'before-sha',
       after: 'after-sha',
@@ -107,16 +108,18 @@ describe('runTodoBotOrchestrator', () => {
     expect(core.setFailed).not.toHaveBeenCalled();
   });
 
-  it('should warn and exit if not a push event', async () => {
-    // @ts-ignore
-    github.context.payload = {}; // Simulate non-push event
-
+  it('should set failed if event is not pull_request or push', async () => {
+    github.context.eventName = 'issues';
     await runTodoBotOrchestrator();
-
-    expect(core.warning).toHaveBeenCalledWith(
-      'This action is designed to run on push events with before/after commit SHAs'
+    expect(core.setFailed).toHaveBeenCalledWith(
+      'This action only supports pull_request and push events, but received issues'
     );
-    expect(mockOctokit.rest.repos.compareCommits).not.toHaveBeenCalled();
+  });
+
+  it('should warn if base or head are missing', async () => {
+    github.context.payload = {}; // Empty payload
+    await runTodoBotOrchestrator();
+    expect(core.warning).toHaveBeenCalledWith('Could not determine base or head commit SHA.');
   });
 
   it('should handle errors gracefully', async () => {
