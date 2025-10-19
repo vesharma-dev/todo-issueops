@@ -179,9 +179,7 @@ describe('runTodoBotOrchestrator', () => {
       github.context.payload.after = headSha;
 
       (mockOctokit.rest.repos.listCommits as jest.Mock).mockResolvedValue({
-        data: [
-          { sha: headSha, parents: [{ sha: parentSha }] }
-        ],
+        data: [{ sha: headSha, parents: [{ sha: parentSha }] }],
       });
 
       const addedTodos: TodoComment[] = [
@@ -221,9 +219,7 @@ describe('runTodoBotOrchestrator', () => {
 
       // listCommits returns a single commit with no parents
       (mockOctokit.rest.repos.listCommits as jest.Mock).mockResolvedValue({
-        data: [
-          { sha: headSha, parents: [] }
-        ],
+        data: [{ sha: headSha, parents: [] }],
       });
 
       const commitFiles = [{ filename: 'init.js', patch: '@@ -0,0 +1 @@\n+// TODO: Initial setup' }];
@@ -239,7 +235,9 @@ describe('runTodoBotOrchestrator', () => {
 
       await runTodoBotOrchestrator();
 
-      expect(core.info).toHaveBeenCalledWith('Could not determine a base for comparison. Processing files in the head commit only.');
+      expect(core.info).toHaveBeenCalledWith(
+        'Could not determine a base for comparison. Processing files in the head commit only.'
+      );
       expect(mockOctokit.rest.repos.compareCommits).toHaveBeenCalledWith({
         owner: 'test-owner',
         repo: 'test-repo',
