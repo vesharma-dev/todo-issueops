@@ -1,0 +1,59 @@
+name: "Local Test"
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch full history for better diff analysis
+
+      - name: Create test TODO files
+        run: |
+          # Create some test files with TODOs for testing
+          mkdir -p test-files
+          cat > test-files/example.js << 'EOF'
+          // This is a test file for TODO Bot
+          function getUserData() {
+            // TODO: Add input validation for user ID
+            // FIXME: Handle null response from API
+            return fetch('/api/user');
+          }
+
+          // TODO: Implement caching mechanism
+          function processData(data) {
+            return data.map(item => item.value);
+          }
+          EOF
+
+          cat > test-files/utils.py << 'EOF'
+          # Test Python file
+          def calculate_total(items):
+              # TODO: Add error handling for empty list
+              # NOTE: This function needs optimization
+              return sum(items)
+
+          # FIXME: Remove hardcoded values
+          MAX_ITEMS = 100
+          EOF
+
+      - name: Run TODO-Bot Action
+        uses: ./ # This tells the workflow to use the action in the current repo
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          keywords: "TODO,FIXME,NOTE"
+          labels: "todo-bot,test"
+          # assignees: 'your-username'  # Uncomment and replace with your username
+
+      - name: List created files (for debugging)
+        run: |
+          echo "Files in test-files directory:"
+          ls -la test-files/
+          echo "Git status:"
+          git status

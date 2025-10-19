@@ -1,0 +1,22 @@
+name: "Local Development Test"
+on:
+  push:
+
+jobs:
+  test-todo-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # Need at least 2 commits for before/after comparison
+
+      - name: Run TODO Bot
+        uses: ./
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          keywords: "TODO,FIXME,HACK,NOTE"
+          labels: "todo-bot,automated"
+        env:
+          # Debug environment variables
+          ACTIONS_STEP_DEBUG: true
