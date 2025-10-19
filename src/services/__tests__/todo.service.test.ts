@@ -56,7 +56,7 @@ describe('todo.service', () => {
       expect(inputs.token).toBe('test-token');
       expect(inputs.keywords).toEqual(['TODO', 'FIXME']);
       expect(inputs.assignees).toEqual([]);
-      expect(inputs.labels).toEqual(['todo-bot']);
+      expect(inputs.labels).toEqual(['todo-issueops']);
     });
 
     xit('should handle empty but defined inputs', () => {
@@ -197,7 +197,7 @@ describe('todo.service', () => {
     it('should return issue number if an issue with the fingerprint is found', async () => {
       const issues = [
         { number: 1, body: 'Some other issue' },
-        { number: 2, body: '<!-- TODO-BOT-FINGERPRINT: test-fingerprint -->' },
+        { number: 2, body: '<!-- TODO-IssueOps-FINGERPRINT: test-fingerprint -->' },
       ];
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({ data: issues });
 
@@ -206,7 +206,7 @@ describe('todo.service', () => {
       expect(mockOctokit.rest.issues.listForRepo).toHaveBeenCalledWith({
         owner: 'owner',
         repo: 'repo',
-        labels: 'todo-bot',
+        labels: 'todo-issueops',
         state: 'open',
       });
     });
@@ -254,20 +254,20 @@ describe('todo.service', () => {
     });
 
     it('should create an issue with correct details', async () => {
-      await createIssueForTodo(mockOctokit as any, 'owner', 'repo', todo, [], ['todo-bot'], 'sha123');
+      await createIssueForTodo(mockOctokit as any, 'owner', 'repo', todo, [], ['todo-issueops'], 'sha123');
 
       expect(mockOctokit.rest.issues.create).toHaveBeenCalledWith({
         owner: 'owner',
         repo: 'repo',
         title: 'Test TODO',
-        body: expect.stringContaining('<!-- TODO-BOT-FINGERPRINT: test-fingerprint -->'),
-        labels: ['todo-bot'],
+        body: expect.stringContaining('<!-- TODO-IssueOps-FINGERPRINT: test-fingerprint -->'),
+        labels: ['todo-issueops'],
       });
       expect(core.info).toHaveBeenCalledWith('Created issue #123 for TODO: Test TODO');
     });
 
     it('should include assignees if provided', async () => {
-      await createIssueForTodo(mockOctokit as any, 'owner', 'repo', todo, ['user1'], ['todo-bot'], 'sha123');
+      await createIssueForTodo(mockOctokit as any, 'owner', 'repo', todo, ['user1'], ['todo-issueops'], 'sha123');
 
       expect(mockOctokit.rest.issues.create).toHaveBeenCalledWith(
         expect.objectContaining({

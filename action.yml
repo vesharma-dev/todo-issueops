@@ -16,7 +16,7 @@ inputs:
   labels:
     description: 'Comma-separated list of labels to add to new issues'
     required: false
-    default: 'todo-bot'
+    default: 'todo-issueops'
 runs:
   using: 'docker'
   image: 'Dockerfile'

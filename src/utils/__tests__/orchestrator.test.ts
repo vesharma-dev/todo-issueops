@@ -53,7 +53,7 @@ describe('runTodoBotOrchestrator', () => {
       token: 'test-token',
       keywords: ['TODO', 'FIXME'],
       assignees: ['test-user'],
-      labels: ['todo-bot'],
+      labels: ['todo-issueops'],
     });
 
     mockOctokit.rest.repos.compareCommits.mockResolvedValue({
@@ -96,7 +96,7 @@ describe('runTodoBotOrchestrator', () => {
       'test-repo',
       addedTodos[0],
       ['test-user'],
-      ['todo-bot'],
+      ['todo-issueops'],
       'after-sha'
     );
 

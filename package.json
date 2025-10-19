@@ -1,5 +1,5 @@
 {
-  "name": "todo-bot",
+  "name": "todo-issueops",
   "version": "1.0.0",
   "description": "A GitHub action that automatically creates, updates, and closes GitHub issues from TODO comments in your code.",
   "main": "dist/index.js",
