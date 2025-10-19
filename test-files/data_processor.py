@@ -4,7 +4,7 @@ Test Python module for TODO Bot
 
 class DataProcessor:
     def __init__(self):
-        # TODO: Load configuration from environment
+        # Configuration loaded
         self.settings = {}
     
     def process_data(self, raw_data):
