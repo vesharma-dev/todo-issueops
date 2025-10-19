@@ -1,5 +1,5 @@
 name: 'TODO Bot'
-description: 'A github action that automatically creates, updates, and closes GitHub issues from TODO comments in your code.'
+description: 'An IssueOps Action that automatically manages issues from TODO comments in your code.'
 author: '@vesharma-dev'
 inputs:
   token:

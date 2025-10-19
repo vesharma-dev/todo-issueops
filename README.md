@@ -1,4 +1,4 @@
-# 🤖 TODO Bot
+# 🤖 TODO IssueOps
 
 [![GitHub Marketplace](https://img.shields.io/badge/GitHub-Marketplace-blue)](https://github.com/marketplace)
 [![Docker](https://img.shields.io/badge/runs%20on-Docker-blue)](https://docs.github.com/en/actions/creating-actions/creating-a-docker-container-action)
