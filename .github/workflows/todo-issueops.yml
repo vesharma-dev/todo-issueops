@@ -12,7 +12,7 @@ jobs:
         # No fetch-depth needed here anymore
 
       - name: 'Run TODO IssueOps'
-        uses: vesharma-dev/todo-issuesops@v0.1.0-alpha
+        uses: vesharma-dev/todo-issueops@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           # labels: 'todo, needs-attention'
