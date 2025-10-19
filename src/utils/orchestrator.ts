@@ -38,40 +38,36 @@ export async function runTodoBotOrchestrator(): Promise<void> {
     // Handle new branch push where `before` is a zero-hash
     if (base === '0000000000000000000000000000000000000000') {
       core.info('New branch detected. Finding parent commit for comparison.');
-      // For a new branch, we find the parent of the first commit in the push
-      const commit = await octokit.rest.repos.getCommit({
+
+      // For a new branch, we list commits and find the parent of the first commit in the push
+      const { data: commits } = await octokit.rest.repos.listCommits({
         owner,
         repo,
-        ref: head,
+        sha: head,
+        per_page: 10, // Get a few recent commits
       });
 
-      if (commit.data.parents.length > 0) {
-        base = commit.data.parents[0].sha;
+      if (commits.length > 1) {
+        // In a multi-commit push to a new branch, the base should be the parent of the oldest commit pushed.
+        // Assuming the push is not > 10 commits, the last commit in our list is the oldest.
+        const oldestCommitInPush = commits[commits.length - 1];
+        if (oldestCommitInPush.parents.length > 0) {
+          base = oldestCommitInPush.parents[0].sha;
+          core.info(`Parent of oldest commit in push found: ${base}`);
+        } else {
+          // This is the first commit in the repository.
+          base = head; // Compare the head with itself to process its files.
+          core.info('First commit in repository. Processing all files in this commit.');
+        }
+      } else if (commits.length === 1 && commits[0].parents.length > 0) {
+        // Single commit push to a new branch
+        base = commits[0].parents[0].sha;
         core.info(`Parent commit found: ${base}`);
       } else {
-        // This is the first commit in the repository. We'll compare against an empty tree.
-        // The compareCommits API can't handle this, so we'll get the commit directly
-        // and treat all files as added.
-        core.info('First commit in repository. Processing all files in this commit.');
-        const { data: commitData } = await octokit.rest.repos.getCommit({
-          owner,
-          repo,
-          ref: head,
-        });
-
-        const { addedTodos } = extractTodosFromDiff(commitData.files, inputs.keywords);
-        core.info(`Found ${addedTodos.length} new TODOs in the first commit.`);
-
-        for (const todo of addedTodos) {
-          const existingIssue = await findExistingIssue(octokit, owner, repo, todo.fingerprint);
-          if (!existingIssue) {
-            await createIssueForTodo(octokit, owner, repo, todo, inputs.assignees, inputs.labels, head);
-          } else {
-            core.info(`Issue #${existingIssue} already exists for TODO: ${todo.content}`);
-          }
-        }
-        core.info('✅ TODO Bot completed successfully for the first commit.');
-        return;
+        // First commit in the repository ever, or other edge case.
+        // We'll process just the head commit.
+        core.info('Could not determine a base for comparison. Processing files in the head commit only.');
+        base = head;
       }
     }
 
