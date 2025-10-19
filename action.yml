@@ -1,25 +1,25 @@
-name: "TODO Bot"
-description: "A github action that automatically creates, updates, and closes GitHub issues from TODO comments in your code."
-author: "@vesharma-dev"
+name: 'TODO Bot'
+description: 'A github action that automatically creates, updates, and closes GitHub issues from TODO comments in your code.'
+author: '@vesharma-dev'
 inputs:
   token:
-    description: "The GitHub token to use for API operations"
+    description: 'The GitHub token to use for API operations'
     required: true
     default: ${{ github.token }}
   keywords:
-    description: "Comma-separated list of keywords to search for in comments"
+    description: 'Comma-separated list of keywords to search for in comments'
     required: false
-    default: "TODO,FIXME"
+    default: 'TODO,FIXME'
   assignees:
-    description: "Comma-separated list of GitHub usernames to assign to new issues"
+    description: 'Comma-separated list of GitHub usernames to assign to new issues'
     required: false
   labels:
-    description: "Comma-separated list of labels to add to new issues"
+    description: 'Comma-separated list of labels to add to new issues'
     required: false
-    default: "todo-bot"
+    default: 'todo-bot'
 runs:
-  using: "docker"
-  image: "Dockerfile"
+  using: 'docker'
+  image: 'Dockerfile'
 branding:
   icon: git-pull-request
   color: white

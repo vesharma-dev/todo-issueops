@@ -1,4 +1,4 @@
-name: "Local Test"
+name: 'Local Test'
 on:
   push:
     branches: [main, develop]
@@ -47,8 +47,8 @@ jobs:
         uses: ./ # This tells the workflow to use the action in the current repo
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          keywords: "TODO,FIXME,NOTE"
-          labels: "todo-bot,test"
+          keywords: 'TODO,FIXME,NOTE'
+          labels: 'todo-bot,test'
           # assignees: 'your-username'  # Uncomment and replace with your username
 
       - name: List created files (for debugging)

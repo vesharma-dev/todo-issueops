@@ -17,7 +17,7 @@ export class UserService {
     // HACK: Temporary workaround for API limitation
     return fetch(`/api/users/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
   }
 }

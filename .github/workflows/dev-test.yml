@@ -1,4 +1,4 @@
-name: "Local Development Test"
+name: 'Local Development Test'
 on:
   push:
 
@@ -15,8 +15,8 @@ jobs:
         uses: ./
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          keywords: "TODO,FIXME,HACK,NOTE"
-          labels: "todo-bot,automated"
+          keywords: 'TODO,FIXME,HACK,NOTE'
+          labels: 'todo-bot,automated'
         env:
           # Debug environment variables
           ACTIONS_STEP_DEBUG: true

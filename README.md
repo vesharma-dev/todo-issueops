@@ -38,9 +38,9 @@ jobs:
         uses: vesharma-dev/todo-bot@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          keywords: "TODO,FIXME,HACK,NOTE"
-          labels: "todo-bot,enhancement"
-          assignees: "vesharma-dev"
+          keywords: 'TODO,FIXME,HACK,NOTE'
+          labels: 'todo-bot,enhancement'
+          assignees: 'vesharma-dev'
 ```
 
 ## 📖 How It Works
@@ -105,9 +105,9 @@ Each TODO becomes a GitHub issue with:
 - name: TODO Bot
   uses: vesharma-dev/todo-bot@v1
   with:
-    keywords: "TODO,FIXME,HACK,NOTE,BUG"
-    labels: "todo-bot,technical-debt,enhancement"
-    assignees: "developer1,developer2"
+    keywords: 'TODO,FIXME,HACK,NOTE,BUG'
+    labels: 'todo-bot,technical-debt,enhancement'
+    assignees: 'developer1,developer2'
 ```
 
 ## 🛠️ Development & Testing
@@ -174,7 +174,6 @@ Interactive menu with options:
 For testing with actual GitHub API:
 
 1. **Create Personal Access Token:**
-
    - Go to [GitHub Settings → Tokens](https://github.com/settings/tokens)
    - Select scopes: `repo` (for private repos) or `public_repo` (for public repos)
 
@@ -225,7 +224,7 @@ todo-bot/
 export async function fetchUsers() {
   // TODO: Add pagination support
   // FIXME: Handle network errors properly
-  return fetch("/api/users");
+  return fetch('/api/users');
 }
 ```
 
@@ -258,7 +257,7 @@ The issue gets automatically closed with a comment explaining the TODO was remov
 ### Custom Keywords
 
 ```yaml
-keywords: "TODO,FIXME,HACK,BUG,OPTIMIZE,REFACTOR,SECURITY"
+keywords: 'TODO,FIXME,HACK,BUG,OPTIMIZE,REFACTOR,SECURITY'
 ```
 
 ### Branch-Specific
@@ -267,7 +266,7 @@ keywords: "TODO,FIXME,HACK,BUG,OPTIMIZE,REFACTOR,SECURITY"
 on:
   push:
     branches: [main]
-    paths: ["**.ts", "**.js", "**.py"]
+    paths: ['**.ts', '**.js', '**.py']
 ```
 
 ### Multiple Workflows
@@ -318,9 +317,9 @@ MIT License - see [LICENSE](LICENSE) for details.
   uses: vesharma-dev/todo-bot@v1
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
-    keywords: "TODO,FIXME,HACK,NOTE,BUG"
-    labels: "todo-bot,technical-debt,enhancement"
-    assignees: "developer1,developer2,team-lead"
+    keywords: 'TODO,FIXME,HACK,NOTE,BUG'
+    labels: 'todo-bot,technical-debt,enhancement'
+    assignees: 'developer1,developer2,team-lead'
 ```
 
 #### Team-Specific Setup
@@ -329,16 +328,16 @@ MIT License - see [LICENSE](LICENSE) for details.
 - name: Frontend TODOs
   uses: vesharma-dev/todo-bot@v1
   with:
-    keywords: "TODO,FIXME"
-    labels: "frontend,todo-bot"
-    assignees: "frontend-team-lead"
+    keywords: 'TODO,FIXME'
+    labels: 'frontend,todo-bot'
+    assignees: 'frontend-team-lead'
 
 - name: Backend TODOs
   uses: vesharma-dev/todo-bot@v1
   with:
-    keywords: "TODO,FIXME,OPTIMIZE"
-    labels: "backend,todo-bot"
-    assignees: "backend-team-lead"
+    keywords: 'TODO,FIXME,OPTIMIZE'
+    labels: 'backend,todo-bot'
+    assignees: 'backend-team-lead'
 ```
 
 ## 🛠️ Development
@@ -404,7 +403,7 @@ Here's what happens when you commit code with TODOs:
 export async function fetchUsers() {
   // TODO: Add pagination support
   // FIXME: Handle network errors properly
-  return fetch("/api/users");
+  return fetch('/api/users');
 }
 ```
 
@@ -543,7 +542,7 @@ test-files/
 Track different types of technical debt:
 
 ```yaml
-keywords: "TODO,FIXME,HACK,BUG,OPTIMIZE,REFACTOR,SECURITY"
+keywords: 'TODO,FIXME,HACK,BUG,OPTIMIZE,REFACTOR,SECURITY'
 ```
 
 ### Environment-Specific TODOs

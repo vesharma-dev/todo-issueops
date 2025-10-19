@@ -1,14 +1,7 @@
-import * as core from "@actions/core";
-import * as github from "@actions/github";
-import {
-  ActionInputs,
-  GitHubCompareResponse,
-  TodoComment,
-} from "../types/main.types";
-import {
-  generateFingerprint,
-  parseTodoFromLine,
-} from "../helpers/todo.helpers";
+import * as core from '@actions/core';
+import * as github from '@actions/github';
+import { ActionInputs, GitHubCompareResponse, TodoComment } from '../types/main.types';
+import { generateFingerprint, parseTodoFromLine } from '../helpers/todo.helpers';
 
 /**
  * Extract TODO comments from git diff
@@ -17,7 +10,7 @@ import {
  * @returns Object containing added and removed TODOs
  */
 export function extractTodosFromDiff(
-  files: GitHubCompareResponse["files"],
+  files: GitHubCompareResponse['files'],
   keywords: string[]
 ): {
   addedTodos: TodoComment[];
@@ -31,12 +24,12 @@ export function extractTodosFromDiff(
   for (const file of files) {
     if (!file.patch) continue;
 
-    const lines = file.patch.split("\n");
+    const lines = file.patch.split('\n');
     let currentLineNumber = 0;
 
     for (const line of lines) {
       // Parse diff header to get line numbers
-      if (line.startsWith("@@")) {
+      if (line.startsWith('@@')) {
         const match = line.match(/@@ -(\d+),?\d* \+(\d+),?\d* @@/);
         if (match) {
           currentLineNumber = parseInt(match[2], 10);
@@ -45,55 +38,36 @@ export function extractTodosFromDiff(
       }
 
       // Handle added lines (start with +)
-      if (line.startsWith("+") && !line.startsWith("+++")) {
+      if (line.startsWith('+') && !line.startsWith('+++')) {
         const todoContent = parseTodoFromLine(line.substring(1), keywords);
         if (todoContent) {
-          const fingerprint = generateFingerprint(
-            todoContent,
-            file.filename,
-            line.substring(1)
-          );
+          const fingerprint = generateFingerprint(todoContent, file.filename, line.substring(1));
           addedTodos.push({
             content: todoContent,
             filePath: file.filename,
             lineNumber: currentLineNumber,
             fingerprint,
-            keywords:
-              keywords.find((k) =>
-                todoContent.toUpperCase().includes(k.toUpperCase())
-              ) || "TODO",
+            keywords: keywords.find((k) => todoContent.toUpperCase().includes(k.toUpperCase())) || 'TODO',
           });
         }
         currentLineNumber++;
       }
       // Handle removed lines (start with -)
-      else if (line.startsWith("-") && !line.startsWith("---")) {
+      else if (line.startsWith('-') && !line.startsWith('---')) {
         const todoContent = parseTodoFromLine(line.substring(1), keywords);
         if (todoContent) {
-          const fingerprint = generateFingerprint(
-            todoContent,
-            file.filename,
-            line.substring(1)
-          );
+          const fingerprint = generateFingerprint(todoContent, file.filename, line.substring(1));
           removedTodos.push({
             content: todoContent,
             filePath: file.filename,
             lineNumber: currentLineNumber,
             fingerprint,
-            keywords:
-              keywords.find((k) =>
-                todoContent.toUpperCase().includes(k.toUpperCase())
-              ) || "TODO",
+            keywords: keywords.find((k) => todoContent.toUpperCase().includes(k.toUpperCase())) || 'TODO',
           });
         }
       }
       // Handle unchanged lines (start with space or no prefix)
-      else if (
-        line.startsWith(" ") ||
-        (!line.startsWith("+") &&
-          !line.startsWith("-") &&
-          !line.startsWith("@"))
-      ) {
+      else if (line.startsWith(' ') || (!line.startsWith('+') && !line.startsWith('-') && !line.startsWith('@'))) {
         currentLineNumber++;
       }
     }
@@ -120,8 +94,8 @@ export async function findExistingIssue(
     const response = await octokit.rest.issues.listForRepo({
       owner,
       repo,
-      labels: "todo-bot",
-      state: "open",
+      labels: 'todo-bot',
+      state: 'open',
     });
 
     for (const issue of response.data) {
@@ -191,9 +165,7 @@ export async function createIssueForTodo(
 
     const response = await octokit.rest.issues.create(createIssueData);
 
-    core.info(
-      `Created issue #${response.data.number} for TODO: ${todo.content}`
-    );
+    core.info(`Created issue #${response.data.number} for TODO: ${todo.content}`);
   } catch (error) {
     core.error(`Failed to create issue for TODO: ${error}`);
   }
@@ -234,8 +206,8 @@ export async function closeIssueForTodo(
       owner,
       repo,
       issue_number: issueNumber,
-      state: "closed",
-      state_reason: "completed",
+      state: 'closed',
+      state_reason: 'completed',
     });
 
     core.info(`Closed issue #${issueNumber} for removed TODO: ${todo.content}`);
@@ -250,33 +222,33 @@ export async function closeIssueForTodo(
  */
 export function getActionInputs(): ActionInputs {
   // For local testing, allow token to be optional and use environment fallback
-  let token = core.getInput("token");
+  let token = core.getInput('token');
   if (!token) {
-    token = process.env.GITHUB_TOKEN || process.env.INPUT_TOKEN || "";
+    token = process.env.GITHUB_TOKEN || process.env.INPUT_TOKEN || '';
     if (!token) {
       core.setFailed(
-        "GitHub token is required. Set it via inputs.token, GITHUB_TOKEN, or INPUT_TOKEN environment variable."
+        'GitHub token is required. Set it via inputs.token, GITHUB_TOKEN, or INPUT_TOKEN environment variable.'
       );
-      throw new Error("Token is required");
+      throw new Error('Token is required');
     }
   }
 
-  const keywordsInput = core.getInput("keywords") || "TODO,FIXME";
-  const assigneesInput = core.getInput("assignees");
-  const labelsInput = core.getInput("labels") || "todo-bot";
+  const keywordsInput = core.getInput('keywords') || 'TODO,FIXME';
+  const assigneesInput = core.getInput('assignees');
+  const labelsInput = core.getInput('labels') || 'todo-bot';
 
   const keywords = keywordsInput
-    .split(",")
+    .split(',')
     .map((k: string) => k.trim())
     .filter((k: string) => k.length > 0);
   const assignees = assigneesInput
     ? assigneesInput
-        .split(",")
+        .split(',')
         .map((a: string) => a.trim())
         .filter((a: string) => a.length > 0)
     : [];
   const labels = labelsInput
-    .split(",")
+    .split(',')
     .map((l: string) => l.trim())
     .filter((l: string) => l.length > 0);
 
