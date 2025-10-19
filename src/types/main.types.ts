@@ -17,6 +17,7 @@ export interface ActionInputs {
   keywords: string[];
   assignees: string[];
   labels: string[];
+  diff_payload?: string;
 }
 
 /**

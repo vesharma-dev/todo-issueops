@@ -1,5 +1,5 @@
-name: 'TODO Bot'
-description: 'A github action that automatically creates, updates, and closes GitHub issues from TODO comments in your code.'
+name: 'TODO IssueOps'
+description: 'A GitHub Action that enables IssueOps by automatically creating, updating, and closing GitHub issues from TODO comments in your code.'
 author: '@vesharma-dev'
 inputs:
   token:
@@ -16,7 +16,7 @@ inputs:
   labels:
     description: 'Comma-separated list of labels to add to new issues'
     required: false
-    default: 'todo-bot'
+    default: 'todo-issueops'
 runs:
   using: 'docker'
   image: 'Dockerfile'

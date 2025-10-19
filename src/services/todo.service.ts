@@ -94,7 +94,7 @@ export async function findExistingIssue(
     const response = await octokit.rest.issues.listForRepo({
       owner,
       repo,
-      labels: 'todo-bot',
+      labels: 'todo-issueops',
       state: 'open',
     });
 
@@ -136,13 +136,13 @@ export async function createIssueForTodo(
 
 **File:** \`${todo.filePath}\`
 **Line:** ${todo.lineNumber}
-**TODO:** ${todo.content}
+**Task:** ${todo.content}
 
 **Link to code:** [View in repository](${codeUrl})
 
 ---
-*This issue is managed by TODO Bot. Do not edit the fingerprint below.*
-<!-- TODO-BOT-FINGERPRINT: ${todo.fingerprint} -->`;
+*This issue is managed by TODO IssueOps. Do not edit the fingerprint below.*
+<!-- TODO-IssueOps-FINGERPRINT: ${todo.fingerprint} -->`;
 
     const createIssueData: {
       owner: string;
@@ -236,8 +236,9 @@ export function getActionInputs(): ActionInputs {
   const keywordsInput = core.getInput('keywords');
   const assigneesInput = core.getInput('assignees');
   const labelsInput = core.getInput('labels');
+  const diffPayloadInput = core.getInput('diff_payload');
 
-  const keywords = (keywordsInput || 'TODO,FIXME')
+  const keywords = (keywordsInput || 'TODO,FIXME,HACK,NOTE')
     .split(',')
     .map((k: string) => k.trim())
     .filter((k: string) => k.length > 0);
@@ -245,10 +246,10 @@ export function getActionInputs(): ActionInputs {
     .split(',')
     .map((a: string) => a.trim())
     .filter((a: string) => a.length > 0);
-  const labels = (labelsInput || 'todo-bot')
+  const labels = (labelsInput || 'todo-issueops')
     .split(',')
     .map((l: string) => l.trim())
     .filter((l: string) => l.length > 0);
 
-  return { token, keywords, assignees, labels };
+  return { token, keywords, assignees, labels, diff_payload: diffPayloadInput };
 }

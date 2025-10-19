@@ -1,4 +1,4 @@
-# 🤖 TODO Bot
+# 🤖 TODO IssueOps
 
 [![GitHub Marketplace](https://img.shields.io/badge/GitHub-Marketplace-blue)](https://github.com/marketplace)
 [![Docker](https://img.shields.io/badge/runs%20on-Docker-blue)](https://docs.github.com/en/actions/creating-actions/creating-a-docker-container-action)
@@ -19,7 +19,7 @@ A GitHub Action that automatically creates, updates, and closes GitHub issues fr
 
 ## 🚀 Quick Start
 
-Add this action to your workflow file (`.github/workflows/todo-bot.yml`):
+Add this action to your workflow file (`.github/workflows/todo-issueops.yml`):
 
 ```yaml
 name: TODO Bot
@@ -28,18 +28,18 @@ on:
     branches: [main, develop]
 
 jobs:
-  todo-bot:
+  todo-issueops:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: TODO Bot
-        uses: vesharma-dev/todo-bot@v1
+        uses: vesharma-dev/todo-issueops@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           keywords: 'TODO,FIXME,HACK,NOTE'
-          labels: 'todo-bot,enhancement'
+          labels: 'todo-issueops,enhancement'
           assignees: 'vesharma-dev'
 ```
 
@@ -76,7 +76,7 @@ Each TODO becomes a GitHub issue with:
 
 - **Title**: The TODO content
 - **Body**: File location, line number, and direct code link
-- **Labels**: Configurable (default: `todo-bot`)
+- **Labels**: Configurable (default: `todo-issueops`)
 - **Fingerprinting**: SHA-256 hash prevents duplicates
 
 ## ⚙️ Configuration
@@ -87,7 +87,7 @@ Each TODO becomes a GitHub issue with:
 | ----------- | -------------------------------------- | -------- | --------------------- |
 | `token`     | GitHub token for API access            | ✅       | `${{ github.token }}` |
 | `keywords`  | Comma-separated keywords to search for | ❌       | `TODO,FIXME`          |
-| `labels`    | Comma-separated labels for new issues  | ❌       | `todo-bot`            |
+| `labels`    | Comma-separated labels for new issues  | ❌       | `todo-issueops`       |
 | `assignees` | Comma-separated GitHub usernames       | ❌       | none                  |
 
 ### Example Configurations
@@ -96,17 +96,17 @@ Each TODO becomes a GitHub issue with:
 
 ```yaml
 - name: TODO Bot
-  uses: vesharma-dev/todo-bot@v1
+  uses: vesharma-dev/todo-issueops@v1
 ```
 
 #### Advanced Setup
 
 ```yaml
 - name: TODO Bot
-  uses: vesharma-dev/todo-bot@v1
+  uses: vesharma-dev/todo-issueops@v1
   with:
     keywords: 'TODO,FIXME,HACK,NOTE,BUG'
-    labels: 'todo-bot,technical-debt,enhancement'
+    labels: 'todo-issueops,technical-debt,enhancement'
     assignees: 'developer1,developer2'
 ```
 
@@ -188,7 +188,7 @@ For testing with actual GitHub API:
 ### Project Structure
 
 ```
-todo-bot/
+todo-issueops/
 ├── src/index.ts          # Main TypeScript logic
 ├── dist/                 # Compiled JavaScript
 ├── scripts/              # Testing scripts
@@ -245,7 +245,7 @@ This issue was automatically created from a TODO comment in the code.
 
 _This issue is managed by TODO Bot. Do not edit the fingerprint below._
 
-<!-- TODO-BOT-FINGERPRINT: a1b2c3d4e5f6g7h8 -->
+<!-- todo-issueops-FINGERPRINT: a1b2c3d4e5f6g7h8 -->
 ```
 
 ### When TODO Removed - Auto-closed
@@ -273,9 +273,9 @@ on:
 
 Create separate workflows for different teams:
 
-- `todo-bot-critical.yml` - Urgent TODOs
-- `todo-bot-frontend.yml` - UI-related TODOs
-- `todo-bot-backend.yml` - API-related TODOs
+- `todo-issueops-critical.yml` - Urgent TODOs
+- `todo-issueops-frontend.yml` - UI-related TODOs
+- `todo-issueops-backend.yml` - API-related TODOs
 
 ## 🤝 Contributing
 
@@ -291,9 +291,9 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## 📞 Support
 
-- 🐛 **Bug Reports**: [Open an issue](https://github.com/vesharma-dev/todo-bot/issues)
-- 💡 **Feature Requests**: [Open an issue](https://github.com/vesharma-dev/todo-bot/issues)
-- 📧 **Questions**: [Discussions](https://github.com/vesharma-dev/todo-bot/discussions)
+- 🐛 **Bug Reports**: [Open an issue](https://github.com/vesharma-dev/todo-issueops/issues)
+- 💡 **Feature Requests**: [Open an issue](https://github.com/vesharma-dev/todo-issueops/issues)
+- 📧 **Questions**: [Discussions](https://github.com/vesharma-dev/todo-issueops/discussions)
 
 ---
 
@@ -307,18 +307,18 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ```yaml
 - name: TODO Bot
-  uses: vesharma-dev/todo-bot@v1
+  uses: vesharma-dev/todo-issueops@v1
 ```
 
 #### Advanced Setup
 
 ```yaml
 - name: TODO Bot
-  uses: vesharma-dev/todo-bot@v1
+  uses: vesharma-dev/todo-issueops@v1
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
     keywords: 'TODO,FIXME,HACK,NOTE,BUG'
-    labels: 'todo-bot,technical-debt,enhancement'
+    labels: 'todo-issueops,technical-debt,enhancement'
     assignees: 'developer1,developer2,team-lead'
 ```
 
@@ -326,17 +326,17 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ```yaml
 - name: Frontend TODOs
-  uses: vesharma-dev/todo-bot@v1
+  uses: vesharma-dev/todo-issueops@v1
   with:
     keywords: 'TODO,FIXME'
-    labels: 'frontend,todo-bot'
+    labels: 'frontend,todo-issueops'
     assignees: 'frontend-team-lead'
 
 - name: Backend TODOs
-  uses: vesharma-dev/todo-bot@v1
+  uses: vesharma-dev/todo-issueops@v1
   with:
     keywords: 'TODO,FIXME,OPTIMIZE'
-    labels: 'backend,todo-bot'
+    labels: 'backend,todo-issueops'
     assignees: 'backend-team-lead'
 ```
 
@@ -352,8 +352,8 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ```bash
 # Clone the repository
-git clone https://github.com/vesharma-dev/todo-bot.git
-cd todo-bot
+git clone https://github.com/vesharma-dev/todo-issueops.git
+cd todo-issueops
 
 # Install dependencies
 pnpm install
@@ -368,7 +368,7 @@ pnpm test
 ### Project Structure
 
 ```
-todo-bot/
+todo-issueops/
 ├── src/
 │   └── index.ts          # Main application logic
 ├── lib/                  # Compiled JavaScript (generated)
@@ -386,10 +386,10 @@ todo-bot/
 pnpm build
 
 # Build Docker image
-docker build -t todo-bot .
+docker build -t todo-issueops .
 
 # Test locally
-docker run --rm todo-bot
+docker run --rm todo-issueops
 ```
 
 ## 📋 Example Workflow
@@ -424,7 +424,7 @@ This issue was automatically created from a TODO comment in the code.
 
 _This issue is managed by TODO Bot. Do not edit the fingerprint below._
 
-<!-- TODO-BOT-FINGERPRINT: a1b2c3d4e5f6g7h8 -->
+<!-- todo-issueops-FINGERPRINT: a1b2c3d4e5f6g7h8 -->
 ```
 
 ### 3. **When TODO is Removed** - Auto-closed
@@ -484,10 +484,10 @@ Test the Docker container locally:
 
 ```bash
 # Build Docker image
-docker build -t todo-bot-local .
+docker build -t todo-issueops-local .
 
 # Run container (requires environment setup)
-docker run --rm -e INPUT_TOKEN=test todo-bot-local
+docker run --rm -e INPUT_TOKEN=test todo-issueops-local
 ```
 
 ### Testing with Real GitHub API
@@ -566,9 +566,9 @@ on:
 
 Create separate workflows for different teams or priorities:
 
-- `todo-bot-critical.yml` - For urgent TODOs
-- `todo-bot-frontend.yml` - For UI-related TODOs
-- `todo-bot-backend.yml` - For API-related TODOs
+- `todo-issueops-critical.yml` - For urgent TODOs
+- `todo-issueops-frontend.yml` - For UI-related TODOs
+- `todo-issueops-backend.yml` - For API-related TODOs
 
 ### Development Guidelines
 
@@ -589,9 +589,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- 🐛 **Bug Reports**: [Open an issue](https://github.com/vesharma-dev/todo-bot/issues)
-- 💡 **Feature Requests**: [Open an issue](https://github.com/vesharma-dev/todo-bot/issues)
-- 📧 **Questions**: [Discussions](https://github.com/vesharma-dev/todo-bot/discussions)
+- 🐛 **Bug Reports**: [Open an issue](https://github.com/vesharma-dev/todo-issueops/issues)
+- 💡 **Feature Requests**: [Open an issue](https://github.com/vesharma-dev/todo-issueops/issues)
+- 📧 **Questions**: [Discussions](https://github.com/vesharma-dev/todo-issueops/discussions)
 
 ---
 
