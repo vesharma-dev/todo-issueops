@@ -1,0 +1,8 @@
+name: todo-bot
+description: Creates & syncs issues from todos
+runs:
+  using: docker
+  image: Dockerfile
+branding:
+  icon: git-pull-request
+  color: white
