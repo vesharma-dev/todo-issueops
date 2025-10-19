@@ -226,10 +226,7 @@ export function getActionInputs(): ActionInputs {
   if (!token) {
     token = process.env.GITHUB_TOKEN || process.env.INPUT_TOKEN || '';
     if (!token) {
-      core.setFailed(
-        'GitHub token is required. Set it via inputs.token, GITHUB_TOKEN, or INPUT_TOKEN environment variable.'
-      );
-      throw new Error('Token is required');
+      throw new Error('GitHub token is required. Set it via inputs.token, GITHUB_TOKEN, or INPUT_TOKEN environment variable.');
     }
   }
 
