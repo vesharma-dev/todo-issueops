@@ -1,0 +1,19 @@
+name: 'TODO Bot Issue Tracker'
+on:
+  pull_request:
+    types: [opened, synchronize] # Runs when a PR is opened or updated
+
+jobs:
+  track_todos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout Code'
+        uses: actions/checkout@v4
+        # No fetch-depth needed here anymore
+
+      - name: 'Run TODO Bot'
+        uses: vesharma-dev/todo-bot@v0.1.0-alpha
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # labels: 'todo, needs-attention'
+          # assignees: 'some-user'

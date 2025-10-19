@@ -4,6 +4,7 @@
 /dist
 /tmp
 /out-tsc
+/lib
 
 # Runtime data
 pids
@@ -57,7 +58,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-
 # Dependency directories
 node_modules/
 jspm_packages/
@@ -89,3 +89,15 @@ lerna-debug.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# Local testing artifacts
+/tmp/act-artifacts
+/tmp/mock-event.json
+*.bak
+test-files/*.bak
+
+# act configuration (keep .actrc but ignore temporary files)
+.secrets
+.env.local
+.input
+.vars
