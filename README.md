@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: 'Run TODO IssueOps'
-        uses: vesharma-dev/todo-bot@v1.0.4 # Use your GitHub username and the new tag
+        uses: vesharma-dev/todo-issueops@v1.0.4 # Use your GitHub username and the new tag
         with:
           # The default token is sufficient for most cases
           token: ${{ secrets.GITHUB_TOKEN }}
